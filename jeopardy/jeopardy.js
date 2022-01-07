@@ -29,18 +29,14 @@ let categories = [];
 
 async function getCategoryIds() {
   // get 100 categories from the API
-  let response = await axios
-    .get(`${BASE_API_URL}categories`,
-      { params: { count: 100 } }
-    );
+  let response = await axios.get(`${BASE_API_URL}categories`,
+      { params: { count: 100 },
+    });
 
-  // randomly select NUM_CATEGORIES from the returned 100
-  let categories = _.sampleSize(response.data, NUM_CATEGORIES);
+   // pare down an array of objects to just an array of IDs
+  let categoryIds = response.data.map(c => c.id); 
 
-  // pare down an array of objects to just an array of IDs
-  let categoryIds = categories.map(cat => {return cat.id});
-
-  return categoryIds;
+  return _.sampleSize(categoryIds, NUM_CATEGORIES);
 }
 
 /** Return object with data about a category:
@@ -56,101 +52,58 @@ async function getCategoryIds() {
  */
 
 async function getCategory(catId) {
-  let response = await axios
-    .get(`${BASE_API_URL}category`,
-      { params: { id: `${catId}` } }
-    );
+  let response = await axios.get(`${BASE_API_URL}category`,
+      { params: { id: catId },
+    });
 
-  // remove keys from clue array that aren't necessary
-  let randomClues = response["clues"].map(clue => {
+  let cat = response.data;
+
+  // pare down to just the clue keys that are necessary
+  let randomClues = _.sampleSize(cat.clues, NUM_CLUES_PER_CAT).map(clue => {
     return clue = { 
       question : clue.question,
       answer : clue.answer, 
-      showing: null 
+      showing: null, 
     }
-
   });
 
-  return { title: response.data.title, clues: randomClues};
+  return { title: cat.title, clues: randomClues};
 }
 
 /** Fill an HTML table with the categories & cells for questions.
  *
- * - The <thead> should be filled w/a <tr>, and a <td> for each category
+ * - The <thead> should be filled w/a <tr>, and a <th> for each category
  * - The <tbody> should be filled w/NUM-CLUES_PER_CAT <tr>s,
  *   each with a question for each category in a <td>
  *   (initially, just show a "?" where the question/answer would go.)
  */
 
 function fillTable() {
-  // could create variables like $newQuestion that's a tr with a td
-  let $newCategory = $("<tr>").append("<td>");
 
-  // Select the container and append the table, then thead and body: 
-  $(".container")
-    .append("<table>")
-    .addClass("table");
+  // clear the board if it's already filled
+  $(".board thead").empty();
+  $(".board tbody").empty();
 
-  $("<thead>")
-    .appendTo(".table")
-    .addClass("tableHead");
-
-  $("<tbody>")
-    .appendTo(".table")
-    .addClass("tableBody");
-
-  // create a tr with a td for each category
-  for (let i = 0; i < NUM_CATEGORIES; i++) {
-    $("thead").append("<tr>").append("<td>");
+  // Add row with headers for categories
+  let $tr = $("<tr>");
+  for (let category of categories) {
+    $tr.append($("<th>").text(category.title));
   }
+  $(".board thead").append($tr);
 
-  // create a NUM_CLUES_PER_CAT trs for each category 
-  for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
-
+  // Add rows with questions for each category
+  const $tBody = $(".board tbody");
+  $tBody.empty();
+  for (let clueIdx = 0; clueIdx < NUM_CLUES_PER_CAT; clueIdx++) {
+    let $tr = $("<tr>");
+    for (let catIdx = 0; catIdx < NUM_CATEGORIES; catIdx++) {
+      $tr.append(
+          $("<td>")
+              .attr("id", `${catIdx}-${clueIdx}`)
+              .append($("<i>").addClass("fas fa-question-circle fa-3x")));
+    }
+    $tBody.append($tr);
   }
-
-  // <table> 
-  //   <thead>
-  //   </thead>
-  //   <tbody>
-  //   </tbody>
-  // </table>
-
-  // create a loop and append 
-
-  // <table> 
-  //   <thead>
-  //     <tr>
-  //       <td></td>
-  //       <td></td>
-  //       <td></td>
-  //       <td></td>
-  //       <td></td>
-  //       <td></td>
-  //     </tr>
-  //   </thead>
-  //   <tbody>
-  //     <tr>
-  //       <td></td>
-  //     </tr>
-  //     <tr>
-  //       <td></td>
-  //     </tr>
-  //     <tr>
-  //       <td></td>
-  //     </tr>
-  //     <tr>
-  //       <td></td>
-  //     </tr>
-  //     <tr>
-  //       <td></td>
-  //     </tr>
-  //   </tbody>
-  // </table>
-
-
-
-
 }
 
 /** Handle clicking on a clue: show the question or answer.
@@ -169,7 +122,8 @@ function handleClick(evt) {
  */
 
 function showLoadingView() {
-
+  // how should I wipe the current board? 
+  // 
 }
 
 /** Remove the loading spinner and update the button used to fetch data. */
@@ -184,11 +138,23 @@ function hideLoadingView() {
  */
 
 async function setupGameBoard() {
+  let categoryIds = await getCategoryIds(); // an array of 6 numbers
+
+  categories = []; 
+  
+  for (let catId of categoryIds) {
+    categories.push(await getCategory(catId));
+  }
+
+  fillTable(); 
 }
 
 /** Start game: show loading state, setup game board, stop loading state */
 
 async function setupAndStart() {
+  showLoadingView(); 
+  await setupGameBoard(); 
+  hideLoadingView(); 
 }
 
 /** At start:
@@ -198,4 +164,6 @@ async function setupAndStart() {
  *   when you click on a clue
  */
 
-// ADD THOSE THINGS HERE
+$("button").on("click", setupAndStart); 
+$(".board").on("click", "td", handleClick);
+
