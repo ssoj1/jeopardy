@@ -116,7 +116,7 @@ function fillTable() {
 
 function handleClick(evt) {
   console.log("event.target is ", evt.target)
-  
+
   let $target = $(evt.target);
   let id = $target.attr("id");
   let [catId, clueId] = id.split("-");
@@ -195,11 +195,7 @@ $("button").on("click", setupAndStart);
 $(".board").on("click", "td", handleClick);
 
 /*
-
-NEXT COMMIT MESSAGE: 
-"additional CSS sytling for the board and "
-
 TO DO: 
-Properly capitalize the category titles? or all caps?
-
+Properly capitalize the category titles? Or all caps?
+Figure out why on click is sometimes finding the td and sometimes the i
 */
