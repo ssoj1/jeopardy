@@ -29,8 +29,11 @@ let categories = [];
 
 async function getCategoryIds() {
   let categoryIds = await axios
-    .get(`${BASE_API_URL}categories/${NUM_CATEGORIES}`, 
-    {params: {count: `${NUM_CATEGORIES}`}});
+    .get(`${BASE_API_URL}categories`, 
+    {params: {count: `${NUM_CATEGORIES}`}}
+    );
+
+    return categoryIds; 
 }
 
 /** Return object with data about a category:
@@ -46,6 +49,16 @@ async function getCategoryIds() {
  */
 
 async function getCategory(catId) {
+  let categoryData = await axios
+    .get(`${BASE_API_URL}category`, 
+    {params: {id: `${catId}`}}
+    );
+
+  // remove two keys that aren't needed
+  delete categoryData["id"]; 
+  delete categoryData["clues_count"]; 
+  
+  return categoryData; 
 }
 
 /** Fill an HTML table with the categories & cells for questions.
