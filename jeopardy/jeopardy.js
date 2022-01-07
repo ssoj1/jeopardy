@@ -115,6 +115,29 @@ function fillTable() {
  * */
 
 function handleClick(evt) {
+  console.log("event.target is ", evt.target)
+  
+  let $target = $(evt.target);
+  let id = $target.attr("id");
+  let [catId, clueId] = id.split("-");
+  let clue = categories[catId].clues[clueId];
+
+  let msg;
+
+  if (!clue.showing) {
+    msg = clue.question;
+    clue.showing = "question";
+  } else if (clue.showing === "question") {
+    msg = clue.answer;
+    clue.showing = "answer";
+    $target.addClass("disabled");
+  } else {
+    // already showing answer; ignore
+    return;
+  }
+
+  // Update text of cell
+  $target.html(msg);
 }
 
 /** Wipe the current Jeopardy board, show the loading spinner,
@@ -122,13 +145,17 @@ function handleClick(evt) {
  */
 
 function showLoadingView() {
-  // how should I wipe the current board? 
-  // 
+  $(".board thead").empty();
+  $(".board tbody").empty();
+  $(".spinner").show(); 
+  $("button").text("Restart");
 }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
 function hideLoadingView() {
+  $(".spinner").hide(); 
+  $(".board").show();
 }
 
 /** Setup game data and board:
@@ -167,3 +194,12 @@ async function setupAndStart() {
 $("button").on("click", setupAndStart); 
 $(".board").on("click", "td", handleClick);
 
+/*
+
+NEXT COMMIT MESSAGE: 
+"additional CSS sytling for the board and "
+
+TO DO: 
+Properly capitalize the category titles? or all caps?
+
+*/

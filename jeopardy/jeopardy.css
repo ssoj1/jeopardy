@@ -39,13 +39,28 @@ button {
 .board {
   margin: auto;
   width: 70%;
-  border: 1px solid white;
   padding: 10px;
-  color: white;
   display: none;
 }
 
-
 table {
-  border: 1px, solid, black;
+  table-layout: fixed;
+  border: 1px solid white;
+  border-collapse: collapse;
+  color: white;
+  width: 100%;
+  text-align: center;
+  background-color: #060ce9;
+}
+
+td, th {
+  border: 1px solid white;
+}
+
+tr {
+  width: 100px;
+}
+
+td {
+  height: 100px;
 }
