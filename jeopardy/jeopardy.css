@@ -29,12 +29,20 @@ button {
   padding: 5px 20px;
 }
 
+.spinner {
+  text-align: center;
+  color: white; 
+  font-size: 100px;
+  display: none;
+}
+
 .board {
   margin: auto;
   width: 70%;
   border: 1px solid white;
   padding: 10px;
   color: white;
+  display: none;
 }
 
 
