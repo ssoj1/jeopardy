@@ -29,13 +29,16 @@ let categories = [];
 
 async function getCategoryIds() {
   // get 100 categories from the API
-  let allCategoryIds = await axios
+  let response = await axios
     .get(`${BASE_API_URL}categories`,
       { params: { count: 100 } }
     );
 
   // randomly select NUM_CATEGORIES from the returned 100
-  let categoryIds = _.sampleSize(allCategoryIds, NUM_CATEGORIES);
+  let categories = _.sampleSize(response.data, NUM_CATEGORIES);
+
+  // pare down an array of objects to just an array of IDs
+  let categoryIds = categories.map(cat => {return cat.id});
 
   return categoryIds;
 }
@@ -53,16 +56,22 @@ async function getCategoryIds() {
  */
 
 async function getCategory(catId) {
-  let categoryData = await axios
+  let response = await axios
     .get(`${BASE_API_URL}category`,
       { params: { id: `${catId}` } }
     );
 
-  // remove two keys that aren't needed
-  delete categoryData["id"];
-  delete categoryData["clues_count"];
+  // remove keys from clue array that aren't necessary
+  let randomClues = response["clues"].map(clue => {
+    return clue = { 
+      question : clue.question,
+      answer : clue.answer, 
+      showing: null 
+    }
 
-  return categoryData;
+  });
+
+  return { title: response.data.title, clues: randomClues};
 }
 
 /** Fill an HTML table with the categories & cells for questions.
