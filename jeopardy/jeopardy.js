@@ -28,12 +28,16 @@ let categories = [];
  */
 
 async function getCategoryIds() {
-  let categoryIds = await axios
-    .get(`${BASE_API_URL}categories`, 
-    {params: {count: `${NUM_CATEGORIES}`}}
+  // get 100 categories from the API
+  let allCategoryIds = await axios
+    .get(`${BASE_API_URL}categories`,
+      { params: { count: 100 } }
     );
 
-    return categoryIds; 
+  // randomly select NUM_CATEGORIES from the returned 100
+  let categoryIds = _.sampleSize(allCategoryIds, NUM_CATEGORIES);
+
+  return categoryIds;
 }
 
 /** Return object with data about a category:
@@ -50,26 +54,94 @@ async function getCategoryIds() {
 
 async function getCategory(catId) {
   let categoryData = await axios
-    .get(`${BASE_API_URL}category`, 
-    {params: {id: `${catId}`}}
+    .get(`${BASE_API_URL}category`,
+      { params: { id: `${catId}` } }
     );
 
   // remove two keys that aren't needed
-  delete categoryData["id"]; 
-  delete categoryData["clues_count"]; 
-  
-  return categoryData; 
+  delete categoryData["id"];
+  delete categoryData["clues_count"];
+
+  return categoryData;
 }
 
 /** Fill an HTML table with the categories & cells for questions.
  *
  * - The <thead> should be filled w/a <tr>, and a <td> for each category
- * - The <tbody> should be filled w/NUM-QUESTIONS_PER_CAT <tr>s,
+ * - The <tbody> should be filled w/NUM-CLUES_PER_CAT <tr>s,
  *   each with a question for each category in a <td>
  *   (initially, just show a "?" where the question/answer would go.)
  */
 
 function fillTable() {
+  // could create variables like $newQuestion that's a tr with a td
+  let $newCategory = $("<tr>").append("<td>");
+
+  // Select the container and append the table, then thead and body: 
+  $(".container")
+    .append("<table>")
+    .addClass("table");
+
+  $("<thead>")
+    .appendTo(".table")
+    .addClass("tableHead");
+
+  $("<tbody>")
+    .appendTo(".table")
+    .addClass("tableBody");
+
+  // create a tr with a td for each category
+  for (let i = 0; i < NUM_CATEGORIES; i++) {
+    $("thead").append("<tr>").append("<td>");
+  }
+
+  // create a NUM_CLUES_PER_CAT trs for each category 
+  for (let i = 0; i < NUM_CLUES_PER_CAT; i++) {
+
+  }
+
+  // <table> 
+  //   <thead>
+  //   </thead>
+  //   <tbody>
+  //   </tbody>
+  // </table>
+
+  // create a loop and append 
+
+  // <table> 
+  //   <thead>
+  //     <tr>
+  //       <td></td>
+  //       <td></td>
+  //       <td></td>
+  //       <td></td>
+  //       <td></td>
+  //       <td></td>
+  //     </tr>
+  //   </thead>
+  //   <tbody>
+  //     <tr>
+  //       <td></td>
+  //     </tr>
+  //     <tr>
+  //       <td></td>
+  //     </tr>
+  //     <tr>
+  //       <td></td>
+  //     </tr>
+  //     <tr>
+  //       <td></td>
+  //     </tr>
+  //     <tr>
+  //       <td></td>
+  //     </tr>
+  //   </tbody>
+  // </table>
+
+
+
+
 }
 
 /** Handle clicking on a clue: show the question or answer.
