@@ -197,5 +197,7 @@ $(".board").on("click", "td", handleClick);
 /*
 TO DO: 
 Properly capitalize the category titles? Or all caps?
-Figure out why on click is sometimes finding the td and sometimes the i
+Clicking on the ? doesn't work, have to click else where in the 
+  box to properly target a td. Need to figure out a solution. 
+Add different color to background of answers to clearly differentiate them
 */
